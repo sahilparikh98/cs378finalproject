@@ -16,4 +16,4 @@ def setupNetworkReader(interface_name):
 if __name__ == "__main__":
     interface = input("Please enter the interface name of your wireless network reader. You can find this by running ifconfig. It should be a wlan.")
     monitorModeInterface = setupNetworkReader(interface)
-    
+
