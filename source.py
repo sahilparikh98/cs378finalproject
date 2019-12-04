@@ -69,9 +69,8 @@ if __name__ == "__main__":
     essid = input("Enter the ESSID (network name) of the access point you are trying to crack: ")
     getBSSIDInfo(essid, monitorModeInterface)
     crackWEP(essid, monitorModeInterface)
-    bssid = getBSSIDInfo(essid, monitorModeInterface)
-
-
+    
+    # user will go to another terminal
 
     gatewayIP = getGatewayIP()
     arpSpoofProc = arpPoison(monitorModeInterface, gatewayIP)
