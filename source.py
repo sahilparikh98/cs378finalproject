@@ -9,6 +9,7 @@ DICT_FILE = "dict.txt"
 def setup():
     os.system("rm *.cap")
     os.system("rm {}".format(WIFITE_PASSWORDS_FILE))
+    os.system("sudo rfkill unblock wifi; sudo rfkill unblock all") # unblock network card before stopping
 
 def crackWPA(essid, dictFile):
     subprocess.Popen(["wifite", "-i", INTERFACE_NAME, "--no-wps", "-e", essid, "--verbose", "--wpa", "--dict", dictFile]).wait()
