@@ -38,7 +38,7 @@ def getGatewayIP():
         raise Exception("Gateway IP not found.")
 
 def arpPoison(interface_name, host):
-    arpSpoofProc = subprocess.Popen(["arpspoof", "-i", interface_name, host])
+    arpSpoofProc = subprocess.Popen(["arpspoof", "-i", interface_name, host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return arpSpoofProc
 
 def sniffPasswords():
