@@ -27,6 +27,7 @@ def connectToNetwork(essid, password):
     # os.system("sudo ifconfig {} up".format(INTERFACE_NAME))
     #os.system("sudo nmcli d wifi connect Vic password praetorian")
     #subprocess.Popen(["sudo", "nmcli", "d", "wifi", "connect", essid, "password", password]).wait()
+    pass
 
 def getGatewayIP():
     with subprocess.Popen(["ip", "route"], stdout=subprocess.PIPE) as proc:
