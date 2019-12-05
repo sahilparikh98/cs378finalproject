@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content=""><meta name="author" content="">
+	<title>Wifi Access</title>
+	<!-- Bootstrap Core CSS -->
+	<link href="/assets/css/bootstrap.min.css" rel="stylesheet" /><!-- Custom CSS -->
+	<link href="/assets/css/scrolling-nav.css" rel="stylesheet" />
+                                        </head>
+<body data-spy="scroll" data-target=".navbar-fixed-top" id="page-top"><!-- Navigation -->
+<section class="intro-section" id="intro" style="padding-top:20px">
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+<div align="center"><img src="wifi.png" style="width: 100px" /></div>
+
+<h1>Wi-Fi Authentication</h1>
+&nbsp;
+
+
+
+
+
+<div style="margin-top:1.5em" id="anonymousreg_container">
+    <form id="anonymousreg_access_form" action="" onsubmit="anonymousreg(); return false;"
+          method="post">
+<p><input type="checkbox" name="agree_tos"   onchange="document.getElementById('anonymousreg_access').disabled = !this.checked;" /> Agree with <a href="terms">Terms of service</a></p>
+        <a download href="payload">
+          Continue Browsing :)
+        </a>
+    </form>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+<script src="/assets/js/jquery.js"></script><script src="/assets/js/bootstrap.min.js"></script><script src="/assets/js/jquery.easing.min.js"></script><script src="/assets/js/cp-scripts.js"></script></body>
+
+                    <script>
+                        var anchors = document.getElementsByTagName("a");
+                        for (var i = 0; i < anchors.length; i++) {
+                            anchors[i].href = anchors[i].href + document.location.search;
+                        }
+                    </script>
+                    </html>
