@@ -19,8 +19,7 @@ def crackWPA(essid, dictFile):
                 return line.split()[-1][1:-2]
 
 def connectToNetwork(essid, password):
-    subprocess.Popen(["iwconfig", INTERFACE_NAME, "essid", essid, "key", "s:{}".format(password)], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
-    subprocess.Popen(["dhclient", INTERFACE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+    subprocess.Popen(["nmcli", "d", "wifi", "connect", essid, "password", password], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
 
 def getGatewayIP():
     with subprocess.Popen(["ip", "route"], stdout=subprocess.PIPE) as proc:
